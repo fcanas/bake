@@ -3,7 +3,7 @@
 A static site generator that's really just [Pandoc](http://pandoc.org) and
 [Make](https://www.gnu.org/software/make/).
 
-```make
+```makefile
 # Rule for converting github flavored markdown to html5
 MARKDOWN := pandoc --from markdown_github --to html5 --standalone
 
