@@ -1,3 +1,9 @@
+# Bake
+
+A static site generator that's really just [Pandoc](http://pandoc.org) and
+[Make](https://www.gnu.org/software/make/).
+
+```make
 # Rule for converting github flavored markdown to html5
 MARKDOWN := pandoc --from markdown_github --to html5 --standalone
 
@@ -57,3 +63,4 @@ $(addprefix $(DEPLOY_DIRECTORY),%.html): %.html
 	@echo Moving $< to $@
 	@mkdir -p $(dir $@)
 	@cp $< $@
+```
