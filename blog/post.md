@@ -1,9 +1,3 @@
-#Something here?
+#Nested One Deep and Converted
 
-#Possibly.
-
-A change to a post.
-
-With things to say. Anything? Yes.
-
-And more things to have written. With details and amendments.
+Written in markdown, and living in /blog, right alongside [this page](static.html).
