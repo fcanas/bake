@@ -1,7 +1,12 @@
 # Bake
 
-A static site generator that's really just [Pandoc](http://pandoc.org) and
-[Make](https://www.gnu.org/software/make/).
+A static site generator that's really just [Pandoc](http://pandoc.org) and [Make](https://www.gnu.org/software/make/).
+
+Bake doesn't do CMS work for you. It lets you publish a static site written in markdown, or manual html, or whatever.
+
+The `Makefile` is the relevant code. The rest of the repository is a description of [this site](http://fcanas.github.io/bake) whose correct generation is evidence of Bake working. A mechanism for automated testing of the product isn't planned, but definitely possible.
+
+## Bake Source
 
 ```makefile
 # Rule for converting github flavored markdown to html5

@@ -49,8 +49,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 <body>
 <h1 id="bake">Bake</h1>
-<p>A static site generator that's really just <a href="http://pandoc.org">Pandoc</a> and<br />
-<a href="https://www.gnu.org/software/make/">Make</a>.</p>
+<p>A static site generator that's really just <a href="http://pandoc.org">Pandoc</a> and <a href="https://www.gnu.org/software/make/">Make</a>.</p>
+<p>Bake doesn't do CMS work for you. It lets you publish a static site written in markdown, or manual html, or whatever.</p>
+<p>The <code>Makefile</code> is the relevant code. The rest of the repository is a description of <a href="http://fcanas.github.io/bake">this site</a> whose correct generation is evidence of Bake working. A mechanism for automated testing of the product isn't planned, but definitely possible.</p>
+<h2 id="bake-source">Bake Source</h2>
 <div class="sourceCode"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span class="co"># Rule for converting github flavored markdown to html5</span>
 <span class="dt">MARKDOWN </span><span class="ch">:=</span><span class="st"> pandoc --from markdown_github --to html5 --standalone</span>
 
