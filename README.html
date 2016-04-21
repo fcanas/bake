@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="bake">Bake</h1>
+<p>A static site generator that's really just <a href="http://pandoc.org">Pandoc</a> and<br />
+<a href="https://www.gnu.org/software/make/">Make</a>.</p>
+<div class="sourceCode"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span class="co"># Rule for converting github flavored markdown to html5</span>
+<span class="dt">MARKDOWN </span><span class="ch">:=</span><span class="st"> pandoc --from markdown_github --to html5 --standalone</span>
+
+<span class="co"># Deploy directory.</span>
+<span class="co"># Excluded from source search. Prepended to all output files</span>
+<span class="dt">DEPLOY_DIRECTORY </span><span class="ch">=</span><span class="st"> ./deploy/</span>
+
+<span class="co"># Source control directory, also excluded from source search</span>
+<span class="dt">SRC_CTL </span><span class="ch">=</span><span class="st"> .git</span>
+
+<span class="dt">find_all </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">shell</span><span class="st"> find . -type f -name </span><span class="ch">$(</span><span class="dt">1</span><span class="ch">))</span>
+
+<span class="co"># All markdown files. Recursive search with `find`</span>
+<span class="dt">ALL_MD </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">call</span><span class="st"> find_all</span><span class="kw">,</span><span class="st">&#39;*.md&#39;</span><span class="ch">)</span>
+<span class="co"># $(shell find . -type f -name &#39;*.md&#39;)</span>
+
+<span class="co"># For all known markdown files: change md extension to html and prepend the</span>
+<span class="co"># deploy directory.</span>
+<span class="dt">HTML_FROM_MD </span><span class="ch">:=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">patsubst</span><span class="st"> %.md</span><span class="kw">,</span><span class="st">%.html</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">ALL_MD</span><span class="ch">))</span>
+
+<span class="co"># Map a function that takes two arguments</span>
+<span class="dt">map </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">foreach</span><span class="st"> a</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">3</span><span class="ch">)</span><span class="kw">,</span><span class="ch">$(</span><span class="kw">call</span><span class="st"> </span><span class="ch">$(</span><span class="dt">1</span><span class="ch">)</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">2</span><span class="ch">)</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">a</span><span class="ch">)))</span>
+<span class="dt">PROCESS_TYPES </span><span class="ch">=</span><span class="st"> %.md</span>
+
+<span class="co">### Identity Files</span>
+<span class="co"># All files that should be deployed as-is</span>
+<span class="co"># Start assuming all files</span>
+<span class="dt">ALL </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">call</span><span class="st"> find_all</span><span class="kw">,</span><span class="st">&#39;*.*&#39;</span><span class="ch">)</span>
+<span class="co"># Non-identity types are types we want to process</span>
+<span class="co"># anything in the deploy directory</span>
+<span class="co"># and files we want to ignore:</span>
+<span class="dt">EXCLUDE_TYPES </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">PROCESS_TYPES</span><span class="ch">)</span><span class="st"> </span><span class="ch">$(</span><span class="dt">DEPLOY_DIRECTORY</span><span class="ch">)</span><span class="st">% ./%.DS_Store ./.git%</span>
+
+<span class="co"># filter out types</span>
+<span class="dt">ALL_IDENTITY </span><span class="ch">:=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">call</span><span class="st"> map</span><span class="kw">,</span><span class="st">filter-out</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">EXCLUDE_TYPES</span><span class="ch">)</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">ALL</span><span class="ch">))</span>
+
+<span class="co"># Everything that needs deploying :</span>
+<span class="co"># all the identity files</span>
+<span class="co"># and all the html files derived from markdown</span>
+<span class="dt">ALL_TO_DEPLOY </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">ALL_IDENTITY</span><span class="ch">)</span><span class="st"> </span><span class="ch">$(</span><span class="dt">HTML_FROM_MD</span><span class="ch">)</span>
+<span class="dt">DEPLOY_TARGETS </span><span class="ch">:=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">subst</span><span class="st"> ./</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">DEPLOY_DIRECTORY</span><span class="ch">)</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">ALL_TO_DEPLOY</span><span class="ch">))</span>
+
+<span class="co"># First recipe is default. Nothing to do except dependency on all html files.</span>
+<span class="dv">bake:</span><span class="dt"> </span><span class="ch">$(</span><span class="dt">DEPLOY_TARGETS</span><span class="ch">)</span>
+
+<span class="dv">clean:</span>
+    <span class="ch">@</span><span class="fu">rm -rf </span><span class="ch">$(</span><span class="dt">DEPLOY_DIRECTORY</span><span class="ch">)</span>
+
+<span class="co"># Recipe for html files in the deploy directory for a corresponding markdown</span>
+<span class="co"># file</span>
+<span class="dv">$(addprefix $(DEPLOY_DIRECTORY),%.html):</span><span class="dt"> %.md</span>
+    <span class="ch">@</span><span class="fu">echo Converting: </span><span class="ch">$&lt;</span>
+    <span class="ch">@</span><span class="fu">mkdir -p </span><span class="ch">$(</span><span class="kw">dir</span><span class="st"> </span><span class="ch">$@)</span>
+    <span class="ch">@$(</span><span class="dt">MARKDOWN</span><span class="ch">)</span><span class="fu"> </span><span class="ch">$&lt;</span><span class="fu"> --output </span><span class="ch">$@</span>
+
+<span class="dv">$(addprefix $(DEPLOY_DIRECTORY),%.html):</span><span class="dt"> %.html</span>
+    <span class="ch">@</span><span class="fu">echo Moving </span><span class="ch">$&lt;</span><span class="fu"> to </span><span class="ch">$@</span>
+    <span class="ch">@</span><span class="fu">mkdir -p </span><span class="ch">$(</span><span class="kw">dir</span><span class="st"> </span><span class="ch">$@)</span>
+    <span class="ch">@</span><span class="fu">cp </span><span class="ch">$&lt;</span><span class="fu"> </span><span class="ch">$@</span></code></pre></div>
+</body>
+</html>
