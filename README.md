@@ -6,15 +6,54 @@ Bake doesn't do CMS work for you. It lets you publish a static site written in m
 
 The `Makefile` is the relevant code. The rest of the repository is a description of [this site](http://fcanas.github.io/bake) whose correct generation is evidence of Bake working. A mechanism for automated testing of the product isn't planned, but definitely possible.
 
+## Use
+
+Use these instructions to deploy a site with [GitHub pages](https://pages.github.com/).
+
+Create a git repository for your content, and copy the `Makefile` from Bake.
+
+```bash
+git init
+curl https://raw.githubusercontent.com/fcanas/bake/master/Makefile > Makefile
+```
+
+Build the site to see locally:
+
+```bash
+make
+```
+
+or build the site and deploy to GitHub pages.
+
+```bash
+make deploy
+```
+
+The Makefile has a `deploy` recipe to push a git subtree to GitHub pages if your remote is setup as `github`. You can edit the last line of the Makefile if that doesn't match your configuration.
+
+### Dependencies
+
+Have [Make](https://www.gnu.org/software/make/) on your system.
+
+Install [Pandoc](http://pandoc.org)
+
+See [Pandoc's installation instructions](http://pandoc.org/installing.html) or try
+
+```bash
+brew install pandoc
+```
+
 ## Bake Source
 
 ```makefile
 # Rule for converting github flavored markdown to html5
 MARKDOWN := pandoc --from markdown_github --to html5 --standalone
 
+
+DEPLOY = deploy
 # Deploy directory.
 # Excluded from source search. Prepended to all output files
-DEPLOY_DIRECTORY = ./deploy/
+DEPLOY_DIRECTORY = ./$(DEPLOY)/
 
 # Source control directory, also excluded from source search
 SRC_CTL = .git
@@ -68,4 +107,13 @@ $(addprefix $(DEPLOY_DIRECTORY),%.html): %.html
 	@echo Moving $< to $@
 	@mkdir -p $(dir $@)
 	@cp $< $@
+
+REMOTE = github
+BRANCH = gh-pages
+
+deploy: bake
+	git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)
+
+force: bake
+	git push $(REMOTE) `git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)`:$(BRANCH) --force
 ```

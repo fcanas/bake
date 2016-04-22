@@ -1,9 +1,11 @@
 # Rule for converting github flavored markdown to html5
 MARKDOWN := pandoc --from markdown_github --to html5 --standalone
 
+
+DEPLOY = deploy
 # Deploy directory.
 # Excluded from source search. Prepended to all output files
-DEPLOY_DIRECTORY = ./deploy/
+DEPLOY_DIRECTORY = ./$(DEPLOY)/
 
 # Source control directory, also excluded from source search
 SRC_CTL = .git
@@ -57,3 +59,12 @@ $(addprefix $(DEPLOY_DIRECTORY),%.html): %.html
 	@echo Moving $< to $@
 	@mkdir -p $(dir $@)
 	@cp $< $@
+
+REMOTE = github
+BRANCH = gh-pages
+
+deploy: bake
+	git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)
+
+force: bake
+	git push $(REMOTE) `git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)` --force
