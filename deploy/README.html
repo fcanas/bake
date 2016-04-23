@@ -1,8 +1,7 @@
-<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="pandoc">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title></title>
   <style type="text/css">code{white-space: pre;}</style>
@@ -43,11 +42,10 @@ code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Ann
 code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
   </style>
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
+  <link rel="stylesheet" href="/writ.min.css">
 </head>
 <body>
+<article>
 <h1 id="bake">Bake</h1>
 <p>A static site generator that's just <a href="http://pandoc.org">Pandoc</a> and <a href="https://www.gnu.org/software/make/">Make</a>.</p>
 <p>Bake isn't a CMS, or a blog engine. It lets you publish a static site written in markdown, or manual html, or whatever.</p>
@@ -69,7 +67,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">brew</span> install pandoc</code></pre></div>
 <h2 id="bake-source">Bake Source</h2>
 <div class="sourceCode"><pre class="sourceCode makefile"><code class="sourceCode makefile"><span class="co"># Rule for converting github flavored markdown to html5</span>
-<span class="dt">MARKDOWN </span><span class="ch">:=</span><span class="st"> pandoc --from markdown_github --to html5 --standalone</span>
+<span class="dt">MARKDOWN </span><span class="ch">:=</span><span class="st"> pandoc --template template.tmp -c writ.min.css --from markdown_github --to html5 --standalone</span>
 
 
 <span class="dt">DEPLOY </span><span class="ch">=</span><span class="st"> deploy</span>
@@ -101,7 +99,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co"># Non-identity types are types we want to process</span>
 <span class="co"># anything in the deploy directory</span>
 <span class="co"># and files we want to ignore:</span>
-<span class="dt">EXCLUDE_TYPES </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">PROCESS_TYPES</span><span class="ch">)</span><span class="st"> </span><span class="ch">$(</span><span class="dt">DEPLOY_DIRECTORY</span><span class="ch">)</span><span class="st">% ./%.DS_Store ./.git%</span>
+<span class="dt">EXCLUDE_TYPES </span><span class="ch">=</span><span class="st"> </span><span class="ch">$(</span><span class="dt">PROCESS_TYPES</span><span class="ch">)</span><span class="st"> </span><span class="ch">$(</span><span class="dt">DEPLOY_DIRECTORY</span><span class="ch">)</span><span class="st">% ./%.DS_Store ./.git% %.tmp</span>
 
 <span class="co"># filter out types</span>
 <span class="dt">ALL_IDENTITY </span><span class="ch">:=</span><span class="st"> </span><span class="ch">$(</span><span class="kw">call</span><span class="st"> map</span><span class="kw">,</span><span class="st">filter-out</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">EXCLUDE_TYPES</span><span class="ch">)</span><span class="kw">,</span><span class="ch">$(</span><span class="dt">ALL</span><span class="ch">))</span>
@@ -120,12 +118,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <span class="co"># Recipe for html files in the deploy directory for a corresponding markdown</span>
 <span class="co"># file</span>
-<span class="dv">$(addprefix $(DEPLOY_DIRECTORY),%.html):</span><span class="dt"> %.md</span>
+<span class="dv">$(addprefix $(DEPLOY_DIRECTORY),%.html):</span><span class="dt"> %.md template.tmp writ.min.css</span>
     <span class="ch">@</span><span class="fu">echo Converting: </span><span class="ch">$&lt;</span>
     <span class="ch">@</span><span class="fu">mkdir -p </span><span class="ch">$(</span><span class="kw">dir</span><span class="st"> </span><span class="ch">$@)</span>
     <span class="ch">@$(</span><span class="dt">MARKDOWN</span><span class="ch">)</span><span class="fu"> </span><span class="ch">$&lt;</span><span class="fu"> --output </span><span class="ch">$@</span>
 
 <span class="dv">$(addprefix $(DEPLOY_DIRECTORY),%.html):</span><span class="dt"> %.html</span>
+    <span class="ch">@</span><span class="fu">echo Moving </span><span class="ch">$&lt;</span><span class="fu"> to </span><span class="ch">$@</span>
+    <span class="ch">@</span><span class="fu">mkdir -p </span><span class="ch">$(</span><span class="kw">dir</span><span class="st"> </span><span class="ch">$@)</span>
+    <span class="ch">@</span><span class="fu">cp </span><span class="ch">$&lt;</span><span class="fu"> </span><span class="ch">$@</span>
+
+<span class="dv">$(addprefix $(DEPLOY_DIRECTORY),%.css):</span><span class="dt"> %.css</span>
     <span class="ch">@</span><span class="fu">echo Moving </span><span class="ch">$&lt;</span><span class="fu"> to </span><span class="ch">$@</span>
     <span class="ch">@</span><span class="fu">mkdir -p </span><span class="ch">$(</span><span class="kw">dir</span><span class="st"> </span><span class="ch">$@)</span>
     <span class="ch">@</span><span class="fu">cp </span><span class="ch">$&lt;</span><span class="fu"> </span><span class="ch">$@</span>
@@ -140,5 +143,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <span class="dv">undeploy:</span>
     git push <span class="ch">$(</span><span class="dt">REMOTE</span><span class="ch">)</span> `git subtree split --prefix <span class="ch">$(</span><span class="dt">DEPLOY</span><span class="ch">)</span> <span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span>`:<span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span> --force</code></pre></div>
+</article>
 </body>
 </html>
