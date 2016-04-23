@@ -47,7 +47,7 @@ brew install pandoc
 
 ```makefile
 # Rule for converting github flavored markdown to html5
-MARKDOWN := pandoc --from markdown_github --to html5 --standalone
+MARKDOWN := pandoc --template template.tmp -c writ.min.css --from markdown_github --to html5 --standalone
 
 
 DEPLOY = deploy
@@ -79,7 +79,7 @@ ALL = $(call find_all,'*.*')
 # Non-identity types are types we want to process
 # anything in the deploy directory
 # and files we want to ignore:
-EXCLUDE_TYPES = $(PROCESS_TYPES) $(DEPLOY_DIRECTORY)% ./%.DS_Store ./.git%
+EXCLUDE_TYPES = $(PROCESS_TYPES) $(DEPLOY_DIRECTORY)% ./%.DS_Store ./.git% %.tmp
 
 # filter out types
 ALL_IDENTITY := $(call map,filter-out,$(EXCLUDE_TYPES),$(ALL))
@@ -98,12 +98,17 @@ clean:
 
 # Recipe for html files in the deploy directory for a corresponding markdown
 # file
-$(addprefix $(DEPLOY_DIRECTORY),%.html): %.md
+$(addprefix $(DEPLOY_DIRECTORY),%.html): %.md template.tmp writ.min.css
 	@echo Converting: $<
 	@mkdir -p $(dir $@)
 	@$(MARKDOWN) $< --output $@
 
 $(addprefix $(DEPLOY_DIRECTORY),%.html): %.html
+	@echo Moving $< to $@
+	@mkdir -p $(dir $@)
+	@cp $< $@
+
+$(addprefix $(DEPLOY_DIRECTORY),%.css): %.css
 	@echo Moving $< to $@
 	@mkdir -p $(dir $@)
 	@cp $< $@
