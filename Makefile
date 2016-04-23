@@ -63,8 +63,10 @@ $(addprefix $(DEPLOY_DIRECTORY),%.html): %.html
 REMOTE = github
 BRANCH = gh-pages
 
-deploy: bake
+deploy: undeploy bake
+	git add $(DEPLOY)
+	git commit -m 'Deploy'
 	git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)
 
-force: bake
-	git push $(REMOTE) `git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)` --force
+undeploy:
+	git push $(REMOTE) `git subtree split --prefix $(DEPLOY) $(BRANCH)`:$(BRANCH) --force

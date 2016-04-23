@@ -1,8 +1,8 @@
 # Bake
 
-A static site generator that's really just [Pandoc](http://pandoc.org) and [Make](https://www.gnu.org/software/make/).
+A static site generator that's just [Pandoc](http://pandoc.org) and [Make](https://www.gnu.org/software/make/).
 
-Bake doesn't do CMS work for you. It lets you publish a static site written in markdown, or manual html, or whatever.
+Bake isn't a CMS, or a blog engine. It lets you publish a static site written in markdown, or manual html, or whatever.
 
 The `Makefile` is the relevant code. The rest of the repository is a description of [this site](http://fcanas.github.io/bake) whose correct generation is evidence of Bake working. A mechanism for automated testing of the product isn't planned, but definitely possible.
 
@@ -29,7 +29,7 @@ or build the site and deploy to GitHub pages.
 make deploy
 ```
 
-The Makefile has a `deploy` recipe to push a git subtree to GitHub pages if your remote is setup as `github`. You can edit the last line of the Makefile if that doesn't match your configuration.
+The Makefile has a `deploy` recipe to push a git subtree to GitHub pages if your remote is setup as `github`. You can edit that area of the Makefile if that doesn't match your configuration.
 
 ### Dependencies
 
@@ -111,9 +111,11 @@ $(addprefix $(DEPLOY_DIRECTORY),%.html): %.html
 REMOTE = github
 BRANCH = gh-pages
 
-deploy: bake
+deploy: undeploy bake
+	git add $(DEPLOY)
+	git commit -m 'Deploy'
 	git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)
 
-force: bake
-	git push $(REMOTE) `git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)`:$(BRANCH) --force
+undeploy:
+	git push $(REMOTE) `git subtree split --prefix $(DEPLOY) $(BRANCH)`:$(BRANCH) --force
 ```
