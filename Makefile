@@ -70,7 +70,7 @@ $(addprefix $(DEPLOY_DIRECTORY),%.css): %.css
 REMOTE = github
 BRANCH = gh-pages
 
-deploy: undeploy bake
+deploy: bake
 	git add $(DEPLOY)
 	git commit -m 'Deploy'
 	git subtree push --prefix=$(DEPLOY) $(REMOTE) $(BRANCH)

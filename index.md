@@ -7,11 +7,11 @@ To find out more, see Bake's [README](README.html).
 
 * [a page with html source](bare.html)
 
-## These are Blog things
+### These are Blog things
 * [a page in the /blog path](blog/post.html)
 * [an html source page in the /blog path](blog/static.html)
 
-## Project Things
+### Project Things
 * [Project index](projects/p1/index.html)
 * [Project thing](projects/p1/thing.html)
 * [Project Entry](projects/p1/entry.html)
