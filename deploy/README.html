@@ -49,8 +49,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 <body>
 <h1 id="bake">Bake</h1>
-<p>A static site generator that's really just <a href="http://pandoc.org">Pandoc</a> and <a href="https://www.gnu.org/software/make/">Make</a>.</p>
-<p>Bake doesn't do CMS work for you. It lets you publish a static site written in markdown, or manual html, or whatever.</p>
+<p>A static site generator that's just <a href="http://pandoc.org">Pandoc</a> and <a href="https://www.gnu.org/software/make/">Make</a>.</p>
+<p>Bake isn't a CMS, or a blog engine. It lets you publish a static site written in markdown, or manual html, or whatever.</p>
 <p>The <code>Makefile</code> is the relevant code. The rest of the repository is a description of <a href="http://fcanas.github.io/bake">this site</a> whose correct generation is evidence of Bake working. A mechanism for automated testing of the product isn't planned, but definitely possible.</p>
 <h2 id="use">Use</h2>
 <p>Use these instructions to deploy a site with <a href="https://pages.github.com/">GitHub pages</a>.</p>
@@ -61,7 +61,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span></code></pre></div>
 <p>or build the site and deploy to GitHub pages.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span> deploy</code></pre></div>
-<p>The Makefile has a <code>deploy</code> recipe to push a git subtree to GitHub pages if your remote is setup as <code>github</code>. You can edit the last line of the Makefile if that doesn't match your configuration.</p>
+<p>The Makefile has a <code>deploy</code> recipe to push a git subtree to GitHub pages if your remote is setup as <code>github</code>. You can edit that area of the Makefile if that doesn't match your configuration.</p>
 <h3 id="dependencies">Dependencies</h3>
 <p>Have <a href="https://www.gnu.org/software/make/">Make</a> on your system.</p>
 <p>Install <a href="http://pandoc.org">Pandoc</a></p>
@@ -133,10 +133,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="dt">REMOTE </span><span class="ch">=</span><span class="st"> github</span>
 <span class="dt">BRANCH </span><span class="ch">=</span><span class="st"> gh-pages</span>
 
-<span class="dv">deploy:</span><span class="dt"> bake</span>
+<span class="dv">deploy:</span><span class="dt"> undeploy bake</span>
+    git add <span class="ch">$(</span><span class="dt">DEPLOY</span><span class="ch">)</span>
+    git commit -m <span class="st">&#39;Deploy&#39;</span>
     git subtree push --prefix=<span class="ch">$(</span><span class="dt">DEPLOY</span><span class="ch">)</span> <span class="ch">$(</span><span class="dt">REMOTE</span><span class="ch">)</span> <span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span>
 
-<span class="dv">force:</span><span class="dt"> bake</span>
-    git push <span class="ch">$(</span><span class="dt">REMOTE</span><span class="ch">)</span> `git subtree push --prefix=<span class="ch">$(</span><span class="dt">DEPLOY</span><span class="ch">)</span> <span class="ch">$(</span><span class="dt">REMOTE</span><span class="ch">)</span> <span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span>`:<span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span> --force</code></pre></div>
+<span class="dv">undeploy:</span>
+    git push <span class="ch">$(</span><span class="dt">REMOTE</span><span class="ch">)</span> `git subtree split --prefix <span class="ch">$(</span><span class="dt">DEPLOY</span><span class="ch">)</span> <span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span>`:<span class="ch">$(</span><span class="dt">BRANCH</span><span class="ch">)</span> --force</code></pre></div>
 </body>
 </html>
