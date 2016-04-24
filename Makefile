@@ -2,7 +2,7 @@ TEMPLATE = ./template.tmp
 CSS = writ.min.css
 
 # Rule for converting github flavored markdown to html5
-MARKDOWN := pandoc --template $(TEMPLATE) -c $(CSS) --from markdown_github --to html5 --standalone
+MARKDOWN := pandoc --template $(TEMPLATE) -c $(CSS) --from markdown_github+pandoc_title_block --to html5 --standalone 
 
 DEPLOY = deploy
 # Deploy directory.
@@ -10,13 +10,12 @@ DEPLOY = deploy
 DEPLOY_DIRECTORY = ./$(DEPLOY)/
 
 # Source control directory, also excluded from source search
-SRC_CTL = .git
+SRC_CTL = ./.git%
 
 find_all = $(shell find . -type f -name $(1))
 
 # All markdown files. Recursive search with `find`
 ALL_MD = $(call find_all,'*.md')
-# $(shell find . -type f -name '*.md')
 
 # For all known markdown files: change md extension to html and prepend the
 # deploy directory.
@@ -24,7 +23,12 @@ HTML_FROM_MD := $(patsubst %.md,%.html,$(ALL_MD))
 
 # Map a function that takes two arguments
 map = $(foreach a,$(3),$(call $(1),$(2),$(a)))
+
+# File types that need to be processed
 PROCESS_TYPES = %.md
+
+# File types that control processing
+CONTROL_TYPES = %.tmp
 
 ### Identity Files
 # All files that should be deployed as-is
@@ -33,9 +37,9 @@ ALL = $(call find_all,'*.*')
 # Non-identity types are types we want to process
 # anything in the deploy directory
 # and files we want to ignore:
-EXCLUDE_TYPES = $(PROCESS_TYPES) $(DEPLOY_DIRECTORY)% ./%.DS_Store ./.git% %.tmp
+EXCLUDE_TYPES = $(PROCESS_TYPES) $(CONTROL_TYPES) $(DEPLOY_DIRECTORY)% $(SRC_CTL) ./%.DS_Store
 
-# filter out types
+# filter out excluded types; everything else gets transfered as-is... "identity"
 ALL_IDENTITY := $(call map,filter-out,$(EXCLUDE_TYPES),$(ALL))
 
 # Everything that needs deploying :

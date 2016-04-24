@@ -1,4 +1,4 @@
-# P1 Index
+% P1 Index
 
 P1 is nested in an empty `projects/` directory.
 
