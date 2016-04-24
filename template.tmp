@@ -30,6 +30,7 @@ $endfor$
 $for(include-before)$
 $include-before$
 $endfor$
+<main>
 $if(title)$
 <header>
 <h1>$title$</h1>
@@ -49,6 +50,7 @@ $endif$
 <article>
 $body$
 </article>
+</main>
 $for(include-after)$
 $include-after$
 $endfor$
